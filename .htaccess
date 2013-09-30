@@ -1,3 +1,4 @@
+SetEnv PHP_VER 5
 RewriteEngine on
 
 # if a directory or a file exists, use it directly
