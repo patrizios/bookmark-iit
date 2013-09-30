@@ -26,14 +26,18 @@ class ScraperFavicon extends Scraper
 
     public $delete_temp = true;
 
+    protected $mimetype;
+
     /**
      * [__construct]
      *
      * @param string $url Url to scrape
      */
-    public function __construct($url)
+    public function __construct($url, $mimetype)
     {
         $this->setUrl($url);
+        $this->setMimeType($mimetype);
+
         $this->run();
 
         $this->saveTempFile();
@@ -120,6 +124,16 @@ class ScraperFavicon extends Scraper
     }
 
     /**
+     * [setMimeType]
+     *
+     * @param string $mimetype Set mimetype
+     */
+    public function setMimeType($mimetype)
+    {
+        $this->mimetype = $mimetype;
+    }
+
+    /**
      * [getMimeType]
      * Get the mimetype of ResponseBody
      *
@@ -127,10 +141,7 @@ class ScraperFavicon extends Scraper
      */
     public function getMimeType()
     {
-        $finfo      = new finfo(FILEINFO_MIME_TYPE);
-        $mimetype   = $finfo->buffer($this->getResponseBody());
-
-        return $mimetype;
+        return $this->mimetype;
     }
 
     /**

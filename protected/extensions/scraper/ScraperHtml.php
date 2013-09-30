@@ -183,6 +183,23 @@ class ScraperHtml extends Scraper
     }
 
     /**
+     * [getFaviconMimeType]
+     * Get the favicon mimetype of the HTML document
+     *
+     * @return string Favicon mimetype
+     */
+    public function getFaviconMimeType()
+    {
+        $links = $this->getHeadLinksByRel('shortcut icon');
+
+        if (!empty($links) && isset($links[0]['type'])) {
+            $type = $links[0]['type'];
+        }
+
+        return $type;
+    }
+
+    /**
      * [getFavicon]
      * Scrape the Favicon of the document
      * and save it in local storage
@@ -191,8 +208,9 @@ class ScraperHtml extends Scraper
      */
     public function getFavicon()
     {
+        $favicon_type   = $this->getFaviconMimeType();
         $favicon_url    = $this->getFaviconUrl();
-        $favicon        = new ScraperFavicon($favicon_url);
+        $favicon        = new ScraperFavicon($favicon_url, $favicon_type);
 
         return $favicon;
     }
@@ -201,6 +219,7 @@ class ScraperHtml extends Scraper
     {
         try {
             $favicon = $this->getFavicon();
+
         } catch (ScraperException $e) {
             return null;
         }
