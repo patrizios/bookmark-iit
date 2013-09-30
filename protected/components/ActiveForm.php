@@ -102,6 +102,15 @@ class ActiveForm extends CActiveForm
             . '</div>';
     }
 
+    /**
+     * [bootstrapEmailField]
+     *
+     * @param CModel  $model         the data model
+     * @param string  $attribute     the attribute name
+     * @param integer $column_length Bootstrap column size (col-lg-X)
+     *
+     * @return string email field element HTML
+     */
     public function bootstrapEmailField(
         CModel $model,
         $attribute,
@@ -134,6 +143,16 @@ class ActiveForm extends CActiveForm
             . '</div>';
     }
 
+    /**
+     * [bootstrapTextArea]
+     *
+     * @param CModel  $model         the data model
+     * @param string  $attribute     the attribute name
+     * @param integer $column_length Bootstrap column size (col-lg-X)
+     * @param integer $rows          TextArea row number
+     *
+     * @return string textarea field element HTML
+     */
     public function bootstrapTextArea(
         CModel $model,
         $attribute,
@@ -165,17 +184,73 @@ class ActiveForm extends CActiveForm
             . $errorMessage
             . '</div>';
     }
-
-    public function bootstrapSubmit($label='submit')
+    /**
+     * [bootstrapSubmit]
+     *
+     * @param string $label label of button
+     *
+     * @return string submit button HTML
+     */
+    public function bootstrapSubmit($label='submit', $offset = 2)
     {
+        if (!is_numeric($offset)) {
+            throw new CException('offset param must be a number');
+        }
+
         return CHtml::submitButton(
             $label,
             array(
-                'class' => 'btn btn-primary col-md-offset-2'
+                'class' => 'btn btn-primary col-md-offset-' . $offset
             )
         );
     }
 
+    /**
+     * [boostrapTextButton]
+     * Create a bootstrap input group with button
+     *
+     * @param CModel $model        the data model
+     * @param string $attribute    the attribute name
+     * @param string $button_label button label
+     * @param string $placeholder  input placeholder
+     *
+     * @return string input group HTML
+     */
+    public function boostrapTextButton(
+        $model,
+        $attribute,
+        $button_label,
+        $placeholder = null
+    ) {
+
+        if (!$placeholder) {
+            $placeholder = $model->getAttributeLabel($attribute);
+        }
+
+        $textField = $this->textField(
+            $model,
+            $attribute,
+            array(
+                'class'         => 'form-control',
+                'placeholder'   => $placeholder
+            )
+        );
+
+        $submitButton = CHtml::submitButton(
+            $button_label,
+            array(
+                'class' => 'btn btn-primary'
+            )
+        );
+
+        return
+            "<div class=\"input-group\">
+                {$textField}
+                <span class=\"input-group-btn\">
+                    {$submitButton}
+                </span>
+            </div>";
+    }
 }
 
 ?>
