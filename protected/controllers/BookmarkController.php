@@ -2,172 +2,270 @@
 
 class BookmarkController extends Controller
 {
-	/**
-	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
-	 * using two-column layout. See 'protected/views/layouts/column2.php'.
-	 */
-	public $layout='//layouts/column2';
+    /**
+     * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
+     * using two-column layout. See 'protected/views/layouts/column2.php'.
+     */
+    public $layout='//layouts/column2';
 
-	/**
-	 * @return array action filters
-	 */
-	public function filters()
-	{
-		return array(
-			'accessControl', // perform access control for CRUD operations
-			'postOnly + delete', // we only allow deletion via POST request
-		);
-	}
+    /**
+     * @return array action filters
+     */
+    public function filters()
+    {
+        return array(
+            'accessControl', // perform access control for CRUD operations
+            'postOnly + delete', // we only allow deletion via POST request
+        );
+    }
 
-	/**
-	 * Specifies the access control rules.
-	 * This method is used by the 'accessControl' filter.
-	 * @return array access control rules
-	 */
-	public function accessRules()
-	{
-		return array(
-			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
-				'users'=>array('*'),
-			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
-				'users'=>array('@'),
-			),
-			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
-				'users'=>array('admin'),
-			),
-			array('deny',  // deny all users
-				'users'=>array('*'),
-			),
-		);
-	}
+    /**
+     * Specifies the access control rules.
+     * This method is used by the 'accessControl' filter.
+     *
+     * @return array access control rules
+     */
+    public function accessRules()
+    {
+        return array(
+            array('allow',  // allow all users to perform 'index' and 'view' actions
+                'actions'=>array('index','view'),
+                'users'=>array('*'),
+            ),
+            array('allow', // allow authenticated user to perform 'create' and 'update' actions
+                'actions'=>array('create','update', 'addfromurl'),
+                'users'=>array('@'),
+            ),
+            array('allow', // allow admin user to perform 'admin' and 'delete' actions
+                'actions'=>array('admin','delete'),
+                'users'=>array('admin'),
+            ),
+            array('deny',  // deny all users
+                'users'=>array('*'),
+            ),
+        );
+    }
 
-	/**
-	 * Displays a particular model.
-	 * @param integer $id the ID of the model to be displayed
-	 */
-	public function actionView($id)
-	{
-		$this->render('view',array(
-			'model'=>$this->loadModel($id),
-		));
-	}
+    /**
+     * Displays a particular model.
+     *
+     * @param integer $id the ID of the model to be displayed
+     */
+    public function actionView($id)
+    {
+        $this->render(
+            'view',
+            array(
+                'model'=>$this->loadModel($id),
+            )
+        );
+    }
 
-	/**
-	 * Creates a new model.
-	 * If creation is successful, the browser will be redirected to the 'view' page.
-	 */
-	public function actionCreate()
-	{
-		$model=new Bookmark;
+    /**
+     * Creates a new model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     */
+    public function actionCreate()
+    {
+        $model=new Bookmark;
 
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
+        // Uncomment the following line if AJAX validation is needed
+        // $this->performAjaxValidation($model);
 
-		if(isset($_POST['Bookmark']))
-		{
-			$model->attributes=$_POST['Bookmark'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
-		}
+        if (isset($_POST['Bookmark'])) {
+            $model->attributes=$_POST['Bookmark'];
+            if($model->save())
+                $this->redirect(array('view','id'=>$model->id));
+        }
 
-		$this->render('create',array(
-			'model'=>$model,
-		));
-	}
+        $this->render(
+            'create',
+            array(
+                'model'=>$model,
+            )
+        );
+    }
 
-	/**
-	 * Updates a particular model.
-	 * If update is successful, the browser will be redirected to the 'view' page.
-	 * @param integer $id the ID of the model to be updated
-	 */
-	public function actionUpdate($id)
-	{
-		$model=$this->loadModel($id);
+    /**
+     * [actionAddFromUrl]
+     * Scrape a page from URL and save it in a Bookmark model.
+     * Accept the param 'url' in POST (required)
+     *
+     * @return null Display a JSON response
+     */
+    public function actionAddFromUrl()
+    {
+        $request = Yii::app()->request;
 
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
+        if (   !$request->isAjaxRequest
+            || !$request->getPost('url')
+        ) {
+            throw new CHttpException('400', 'Bad request');
+        }
 
-		if(isset($_POST['Bookmark']))
-		{
-			$model->attributes=$_POST['Bookmark'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
-		}
+        $url    = $request->getPost('url');
+        $errors = array();
+        $data   = array();
 
-		$this->render('update',array(
-			'model'=>$model,
-		));
-	}
+        try {
+            $page   = new ScraperHtml($url);
+        } catch (ScraperInvalidUrlException $e) {
+            $errors[] = 'Invalid URL';
+        } catch (ScraperRequestErrorException $e) {
+            $errors[] = 'Request error';
+        } catch(ScraperContentNotPermittedException $e) {
+            $errors[] = 'Content not permitted';
+        }
 
-	/**
-	 * Deletes a particular model.
-	 * If deletion is successful, the browser will be redirected to the 'admin' page.
-	 * @param integer $id the ID of the model to be deleted
-	 */
-	public function actionDelete($id)
-	{
-		$this->loadModel($id)->delete();
+        if (empty($errors)) {
 
-		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
-		if(!isset($_GET['ajax']))
-			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
-	}
+            $model  = new Bookmark();
 
-	/**
-	 * Lists all models.
-	 */
-	public function actionIndex()
-	{
-		$dataProvider=new CActiveDataProvider('Bookmark');
-		$this->render('index',array(
-			'dataProvider'=>$dataProvider,
-		));
-	}
+            $model->url         = $url;
+            $model->title       = $page->getTitle();
+            $model->description = $page->getMeta('description');
 
-	/**
-	 * Manages all models.
-	 */
-	public function actionAdmin()
-	{
-		$model=new Bookmark('search');
-		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Bookmark']))
-			$model->attributes=$_GET['Bookmark'];
+            $errors = array();
+            if ($model->save()) {
+                $data = array(
+                    'url'           => $model->url,
+                    'title'         => $model->title,
+                    'description'   => $model->description,
+                );
+            } else {
+                $errors = $model->errors;
+            }
+        }
 
-		$this->render('admin',array(
-			'model'=>$model,
-		));
-	}
+        $this->displayJsonResponse(
+            array(
+                'data'      => $data,
+                'errors'    => $errors
+            )
+        );
+    }
 
-	/**
-	 * Returns the data model based on the primary key given in the GET variable.
-	 * If the data model is not found, an HTTP exception will be raised.
-	 * @param integer $id the ID of the model to be loaded
-	 * @return Bookmark the loaded model
-	 * @throws CHttpException
-	 */
-	public function loadModel($id)
-	{
-		$model=Bookmark::model()->findByPk($id);
-		if($model===null)
-			throw new CHttpException(404,'The requested page does not exist.');
-		return $model;
-	}
+    /**
+     * Updates a particular model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     *
+     * @param integer $id the ID of the model to be updated
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->loadModel($id);
 
-	/**
-	 * Performs the AJAX validation.
-	 * @param Bookmark $model the model to be validated
-	 */
-	protected function performAjaxValidation($model)
-	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='bookmark-form')
-		{
-			echo CActiveForm::validate($model);
-			Yii::app()->end();
-		}
-	}
+        // Uncomment the following line if AJAX validation is needed
+        // $this->performAjaxValidation($model);
+
+        if (isset($_POST['Bookmark'])) {
+            $model->attributes=$_POST['Bookmark'];
+            if($model->save())
+                $this->redirect(array('view','id'=>$model->id));
+        }
+
+        $this->render(
+            'update',
+            array(
+                'model'=>$model,
+            )
+        );
+    }
+
+    /**
+     * Deletes a particular model.
+     * If deletion is successful, the browser will be redirected to the 'admin' page.
+     *
+     * @param integer $id the ID of the model to be deleted
+     */
+    public function actionDelete($id)
+    {
+        $this->loadModel($id)->delete();
+
+        // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+        if (!isset($_GET['ajax']))
+
+            $return_url = isset($_POST['returnUrl'])
+                        ? $_POST['returnUrl']
+                        : array('admin');
+
+            $this->redirect($return_url);
+    }
+
+    /**
+     * Lists all models.
+     */
+    public function actionIndex()
+    {
+        $model = new Bookmark('search');
+
+        $model->unsetAttributes();  // clear any default values
+
+        if (isset($_GET['Bookmark'])) {
+            $model->attributes=$_GET['Bookmark'];
+        }
+
+        $dataProvider = $model->full_search
+                        ? $model->fullSearch()
+                        : $model->search();
+
+        //send model object for search
+        $this->render(
+            'index',
+            array(
+                'dataProvider'  => $dataProvider,
+                'model'         => $model
+            )
+        );
+    }
+
+    /**
+     * Manages all models.
+     */
+    public function actionAdmin()
+    {
+        $model=new Bookmark('search');
+        $model->unsetAttributes();  // clear any default values
+        if(isset($_GET['Bookmark']))
+            $model->attributes=$_GET['Bookmark'];
+
+        $this->render(
+            'admin',
+            array(
+                'model'=>$model,
+            )
+        );
+    }
+
+    /**
+     * Returns the data model based on the primary key given in the GET variable.
+     * If the data model is not found, an HTTP exception will be raised.
+     *
+     * @param integer $id the ID of the model to be loaded
+     *
+     * @return Bookmark the loaded model
+     * @throws CHttpException
+     */
+    public function loadModel($id)
+    {
+        $model=Bookmark::model()->findByPk($id);
+
+        if ($model===null) {
+            throw new CHttpException(404, 'The requested page does not exist.');
+        }
+        return $model;
+    }
+
+    /**
+     * Performs the AJAX validation.
+     *
+     * @param Bookmark $model the model to be validated
+     */
+    protected function performAjaxValidation($model)
+    {
+        if (isset($_POST['ajax']) && $_POST['ajax']==='bookmark-form') {
+            echo CActiveForm::validate($model);
+            Yii::app()->end();
+        }
+    }
 }
