@@ -52,6 +52,3 @@ $this->widget('zii.widgets.CDetailView', array(
     'updated',
   ),
 )); */ ?>
-
-<br/>
-<br/>
