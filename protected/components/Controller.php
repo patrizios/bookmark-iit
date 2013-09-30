@@ -20,4 +20,16 @@ class Controller extends CController
      * for more details on how to specify this property.
      */
     public $breadcrumbs=array();
+
+    /**
+     * [displayJsonResponse]
+     * Display a JSON response from array
+     *
+     * @param  array  $data Data to encode for the response
+     */
+    public function displayJsonResponse(array $data)
+    {
+        echo CJSON::encode($data);
+        Yii::app()->end();
+    }
 }
