@@ -2,19 +2,64 @@
 /* @var $this SiteController */
 
 $this->pageTitle='';
+
+$clientScript = Yii::app()->clientScript;
+$clientScript->registerScriptFile(Yii::app()->theme->baseUrl.'/js/angular.min.js');
+
+$clientScript->registerScriptFile(Yii::app()->theme->baseUrl.'/js/angular.controllers.js');
+
+
+
 ?>
 
-<h1>Welcome to <i><?php echo CHtml::encode(Yii::app()->name); ?></i></h1>
 
-<p>Congratulations! You have successfully created your Yii application.</p>
 
-<p>You may change the content of this page by modifying the following two files:</p>
-<ul>
-	<li>View file: <code><?php echo __FILE__; ?></code></li>
-	<li>Layout file: <code><?php echo $this->getLayoutFile('main'); ?></code></li>
-</ul>
 
-<p>For more details on how to further develop this application, please read
-the <a href="http://www.yiiframework.com/doc/">documentation</a>.
-Feel free to ask in the <a href="http://www.yiiframework.com/forum/">forum</a>,
-should you have any questions.</p>
+
+
+
+
+
+
+
+<? /*
+
+<div ng-app>
+  <script>
+      var bookmark_list_url    = "<?php echo $this->createUrl('bookmark/jsonlist'); ?>" ;
+  </script>
+
+
+
+
+  <div ng-controller="BookmarkCtrl">
+
+
+
+      <form ng-submit="addBookmark()">
+        <div class="col-lg-12">
+          <div class="input-group">
+            <input
+              ng-model="bookmarkURL"
+              type="text"
+              class="form-control"
+              placeholder="paste a URL"
+            >
+            <span class="input-group-btn">
+              <button class="btn btn-primary" type="button">Add!</button>
+            </span>
+          </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+      </form>
+
+  <br />
+
+      <ul>
+          <li ng-repeat="bookmark in bookmarks">
+              <a href="{{bookmark.url}}">{{bookmark.title}}</a>
+          </li>
+      </ul>
+  </div>
+</div>
+*/ ?>
+

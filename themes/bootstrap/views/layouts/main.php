@@ -36,7 +36,7 @@
                         'items'=>array(
                             array(
                                 'label'     => 'Home',
-                                'url'       => array('/site/index')
+                                'url'       => array('/bookmark/index')
                             ),
                             array(
                                 'label'     => 'About',
@@ -52,7 +52,7 @@
                                 'visible'   => Yii::app()->user->isGuest
                             ),
                             array(
-                                'label'     => 'Logout ('.Yii::app()->user->name.')',
+                                'label'     => 'Logout',
                                 'url'       => array('/site/logout'),
                                 'visible'   => !Yii::app()->user->isGuest
                             )
@@ -66,7 +66,6 @@
             </div>
           </div>
       </div>
-      <?php /* <h1><?php echo CHtml::encode($this->pageTitle); ?></h1> */ ?>
 
       <div class="row">
         <div class="col-lg-12">

@@ -4,21 +4,21 @@
 /* @var $form CActiveForm */
 
 $js = $this->renderPartial(
-    'js/_search_js',
+    'js/_add_js',
     $data           = null,
     $return         = true
 );
-Yii::app()->clientScript->registerScript('search_bookmark', $js);
-
+Yii::app()->clientScript->registerScript('add_bookmark', $js);
 ?>
-<div class="search-form" >
+
+<div class="add-form" >
 
     <?php
         $form=$this->beginWidget(
             'ActiveForm',
             array(
                 'action'        => Yii::app()->createUrl($this->route),
-                'method'        => 'get',
+                'method'        => 'post',
                 'htmlOptions'   => array(
                     'role'  => 'form',
                     'class' => 'form',
@@ -31,19 +31,24 @@ Yii::app()->clientScript->registerScript('search_bookmark', $js);
         <?php
             echo $form->boostrapTextButton(
                 $model,
-                'full_search',
-                'Search'
+                'url',
+                'Add!',
+                'Paste a URL'
             );
         ?>
     </div>
-<?php /*
-    <div class="form-group">
-        <?php echo $form->bootstrapTextField($model, 'full_search', 10); ?>
+
+    <div id="add-errors"
+        class="alert alert-danger"
+        style="margin-top:10px; display:none;"
+    >
+        <button type="button" class="close" aria-hidden="true">&times;</button>
+        <ul></ul>
     </div>
 
-    <div class="form-group buttons">
-        <?php echo $form->bootstrapSubmit('Search', $offset = 0); ?>
-    </div>
-*/ ?>
     <?php $this->endWidget(); ?>
+
+<?php /*
+    <div id="add-errors" class="alert alert-danger" style="display:none">
+    </div> */ ?>
 </div><!-- search-form -->

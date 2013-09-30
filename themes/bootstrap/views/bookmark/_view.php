@@ -4,6 +4,9 @@
 ?>
 <div class="view list-group-item">
   <h4>
+    <?php if ($data->favicon): ?>
+      <img src="favicons/<?php echo $data->favicon; ?>"/>
+    <?php endif; ?>
     <?php $title = $data->title ? CHtml::encode($data->title) : 'No title'; ?>
     <?php echo CHtml::link($title, array('view', 'id'=>$data->id)); ?>
   </h4>
