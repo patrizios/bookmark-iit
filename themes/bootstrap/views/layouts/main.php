@@ -16,63 +16,57 @@
 
     <!-- Custom styles for this template -->
     <link href="<?php echo $theme_path; ?>/css/jumbotron-narrow.css" rel="stylesheet">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="../../assets/js/html5shiv.js"></script>
-      <script src="../../assets/js/respond.min.js"></script>
-    <![endif]-->
+    <script src="<?php echo $theme_path; ?>/js/bootstrap.min.js"></script>
   </head>
 
   <body>
     <div class="container">
       <div class="header">
-        <?php /*  <ul class="nav nav-pills pull-right">
-          <li class="active"><a href="#">Home</a></li>
-          <li><a href="<?php echo $this->createUrl('site/about'); ?>">About</a></li>
-          <li><a href="<?php echo $this->createUrl('site/page', array('about')); ?>">Contact</a></li>
-       </ul> */ ?>
-
-       <?php
-        $this->widget(
-            'zii.widgets.CMenu',
-            array(
-                'items'=>array(
+        <div class="row">
+            <div class="col-lg-6">
+                <h3 class="text-muted">
+                  <?php echo CHtml::encode(Yii::app()->name); ?>
+                </h3>
+            </div>
+            <div class="col-lg-6">
+                <?php
+                $this->widget(
+                    'zii.widgets.CMenu',
                     array(
-                        'label'     => 'Home',
-                        'url'       => array('/site/index')
-                    ),
-                    array(
-                        'label'     => 'About',
-                        'url'       => array('/site/page', 'view'=>'about')
-                    ),
-                    array(
-                        'label'     => 'Contact',
-                        'url'       => array('/site/contact')
-                    ),
-                    array(
-                        'label'     => 'Login',
-                        'url'       => array('/site/login'),
-                        'visible'   => Yii::app()->user->isGuest
-                    ),
-                    array(
-                        'label'     => 'Logout ('.Yii::app()->user->name.')',
-                        'url'       => array('/site/logout'),
-                        'visible'   => !Yii::app()->user->isGuest
+                        'items'=>array(
+                            array(
+                                'label'     => 'Home',
+                                'url'       => array('/site/index')
+                            ),
+                            array(
+                                'label'     => 'About',
+                                'url'       => array('/site/page', 'view'=>'about')
+                            ),
+                            array(
+                                'label'     => 'Contact',
+                                'url'       => array('/site/contact')
+                            ),
+                            array(
+                                'label'     => 'Login',
+                                'url'       => array('/site/login'),
+                                'visible'   => Yii::app()->user->isGuest
+                            ),
+                            array(
+                                'label'     => 'Logout ('.Yii::app()->user->name.')',
+                                'url'       => array('/site/logout'),
+                                'visible'   => !Yii::app()->user->isGuest
+                            )
+                        ),
+                        'htmlOptions' => array(
+                            'class' => 'nav nav-pills'
+                        ),
+                        'activeCssClass' => 'active'
                     )
-                ),
-                'htmlOptions' => array(
-                    'class' => 'nav nav-pills pull-right'
-                ),
-                'activeCssClass' => 'active'
-            )
-        ); ?>
-
-        <h3 class="text-muted">
-          <?php echo CHtml::encode(Yii::app()->name); ?>
-        </h3>
+                ); ?>
+            </div>
+          </div>
       </div>
-      <h1><?php echo CHtml::encode($this->pageTitle); ?></h1>
+      <?php /* <h1><?php echo CHtml::encode($this->pageTitle); ?></h1> */ ?>
 
       <div class="row">
         <div class="col-lg-12">

@@ -60,7 +60,6 @@ If you have business inquiries or other questions, please fill out the following
         <?php echo $form->bootstrapTextField($model, 'name'); ?>
     </div>
 
-
     <div class="form-group">
         <?php echo $form->bootstrapLabel($model, 'email'); ?>
         <?php echo $form->bootstrapEmailField($model, 'email'); ?>
