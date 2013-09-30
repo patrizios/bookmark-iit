@@ -9,7 +9,7 @@ class Scraper
      * Http client max redirects
      * @var integer
      */
-    public $maxredirects = 0;
+    public $maxredirects = 1;
 
     /**
      * [$timeout]
@@ -39,16 +39,16 @@ class Scraper
     public function __construct($url)
     {
         $this->setUrl($url);
-        $this->_run();
+        $this->run();
     }
 
     /**
-     * [_run]
+     * [run]
      * Run the scrape operations
      *
      * @return null
      */
-    private function _run()
+    protected function run()
     {
         $this->_initClient();
         $this->sendRequest();
@@ -56,11 +56,15 @@ class Scraper
         $response = $this->getResponse();
 
         if (!$response->isSuccessful()) {
-            throw new ScraperRequestErrorException();
+            throw new ScraperRequestErrorException(
+                'Request Error: ' . $this->_url
+            );
         }
 
         if (!$this->isPermittedContentType()) {
-            throw new ScraperContentNotPermittedException();
+            throw new ScraperContentNotPermittedException(
+                'Content not permitted: ' . $this->getResponseContenType()
+            );
         }
     }
 
@@ -96,7 +100,9 @@ class Scraper
         if ($this->isValidUrl($url)) {
             $this->_url = $url;
         } else {
-            throw new ScraperInvalidUrlException();
+            throw new ScraperInvalidUrlException(
+                'Invalid URL: ' . $this->_url
+            );
         }
     }
 
@@ -245,7 +251,7 @@ class Scraper
         $regex = "^(https?|ftp)\:\/\/";
 
         // user and pass (optional)
-        // $re .= "([a-z0-9+!*(),;?&=\$_.-]+(\:[a-z0-9+!*(),;?&=\$_.-]+)?@)?";
+        $regex .= "([a-z0-9+!*(),;?&=\$_.-]+(\:[a-z0-9+!*(),;?&=\$_.-]+)?@)?";
 
         // http://x.xx(x) = minimum
         $regex .= "([a-z0-9+\$_-]+\.)*[a-z0-9+\$_-]{2,3}";
@@ -258,18 +264,38 @@ class Scraper
 
         return preg_match("/$regex/siU", $url);
     }
+
+    /**
+     * [isAbsoluteUrl]
+     * Check if a URL is absoute
+     *
+     * @param string $url URL to check
+     *
+     * @return boolean TRUE if absolute, FALSE if relative
+     */
+    public function isAbsoluteUrl($url)
+    {
+        $parsed = parse_url($url);
+
+        if (isset($parsed['scheme']) && isset($parsed['domain']))
+            return true;
+        else
+            return false;
+    }
+
 }
 /**
  * Generic Scraper Exception
  */
-class ScraperException extends Exception { }
+class ScraperException extends Exception
+{
+}
 
 /**
  * Invalid URL Exception
  */
 class ScraperInvalidUrlException extends ScraperException
 {
-    protected $message = 'Invalid URL';
 }
 
 /**
@@ -277,7 +303,6 @@ class ScraperInvalidUrlException extends ScraperException
  */
 class ScraperRequestErrorException extends ScraperException
 {
-    protected $message = 'Request Error';
 }
 
 /**
@@ -285,5 +310,4 @@ class ScraperRequestErrorException extends ScraperException
  */
 class ScraperContentNotPermittedException extends ScraperException
 {
-    protected $message = 'Content not permitted';
 }

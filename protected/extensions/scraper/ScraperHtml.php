@@ -160,4 +160,51 @@ class ScraperHtml extends Scraper
 
         return null;
     }
+
+    /**
+     * [getFaviconUrl]
+     * Get the favicon url of the HTML document
+     *
+     * @return string Favicon url
+     */
+    public function getFaviconUrl()
+    {
+        $links = $this->getHeadLinksByRel('shortcut icon');
+
+        if (!empty($links) && isset($links[0]['href'])) {
+            $url = $links[0]['href'];
+        }
+
+        if ($this->isAbsoluteUrl($url)) {
+            return $url;
+        } else {
+            return UrlHelper::combineUrl($this->getUrl(), $url);
+        }
+    }
+
+    /**
+     * [getFavicon]
+     * Scrape the Favicon of the document
+     * and save it in local storage
+     *
+     * @return ScraperFavicon The scraper object
+     */
+    public function getFavicon()
+    {
+        $favicon_url    = $this->getFaviconUrl();
+        $favicon        = new ScraperFavicon($favicon_url);
+
+        return $favicon;
+    }
+
+    public function getFaviconName()
+    {
+        try {
+            $favicon = $this->getFavicon();
+        } catch (ScraperException $e) {
+            return null;
+        }
+
+        return $favicon->getFileName() . '.png';
+    }
 }

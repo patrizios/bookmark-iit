@@ -108,7 +108,7 @@ class BookmarkController extends Controller
         $data   = array();
 
         try {
-            $page   = new ScraperHtml($url);
+            $page = new ScraperHtml($url);
         } catch (ScraperInvalidUrlException $e) {
             $errors[] = 'Invalid URL';
         } catch (ScraperRequestErrorException $e) {
@@ -124,6 +124,7 @@ class BookmarkController extends Controller
             $model->url         = $url;
             $model->title       = $page->getTitle();
             $model->description = $page->getMeta('description');
+            $model->favicon     = $page->getFaviconName();
 
             $errors = array();
             if ($model->save()) {
