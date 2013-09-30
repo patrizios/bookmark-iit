@@ -15,6 +15,8 @@
  */
 class Bookmark extends CActiveRecord
 {
+    public $full_search;
+
     /**
      * [tableName]
      *
@@ -41,7 +43,7 @@ class Bookmark extends CActiveRecord
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
             array(
-                'id, url, title, description, content, created, updated',
+                'id, url, title, description, content, created, updated, full_search',
                 'safe',
                 'on'=>'search'
             ),
@@ -76,7 +78,23 @@ class Bookmark extends CActiveRecord
             'content'       => 'Content',
             'created'       => 'Created',
             'updated'       => 'Updated',
+            'full_search'   => 'Search something'
         );
+    }
+
+    public function beforeSave()
+    {
+        $now = date('Y-m-d H:i:s');
+
+        if ($this->isNewRecord && !$this->created) {
+            $this->created = $now;
+        }
+
+        if (!$this->updated) {
+            $this->updated = $now;
+        }
+
+        return parent::beforeSave();
     }
 
     /**
@@ -108,11 +126,59 @@ class Bookmark extends CActiveRecord
         return new CActiveDataProvider(
             $this,
             array(
-            'criteria'=>$criteria,
+                'criteria'  =>$criteria,
+                'sort'      =>array('defaultOrder'=>'updated DESC')
             )
         );
     }
 
+    /**
+     * Retrieves a list of models based on the current search/filter conditions.
+     *
+     * Typical usecase:
+     * - Initialize the model fields with values from filter form.
+     * - Execute this method to get CActiveDataProvider instance which will filter
+     * models according to data in model fields.
+     * - Pass data provider to CGridView, CListView or any similar widget.
+     *
+     * @return CActiveDataProvider the data provider that can return the models
+     * based on the search/filter conditions.
+     */
+    public function fullSearch()
+    {
+        // @todo Please modify the following code to remove attributes that should not be searched.
+        $criteria       = new CDbCriteria;
+
+        $partialMatch   = true;
+        $operator       = 'OR';
+
+        $fields_to_compare = array(
+            'id',
+            'url',
+            'title',
+            'description',
+            'content',
+            'created',
+            'updated',
+        );
+
+        foreach ($fields_to_compare as $field) {
+            $criteria->compare(
+                $field,
+                $this->full_search,
+                $partialMatch,
+                $operator
+            );
+        }
+
+        return new CActiveDataProvider(
+            $this,
+            array(
+                'criteria'  =>$criteria,
+                'sort'      =>array('defaultOrder'=>'updated DESC')
+            )
+        );
+    }
     /**
      * Returns the static model of the specified AR class.
      * Please note that you should have this exact method in all your
