@@ -84,7 +84,8 @@ return array(
     // using Yii::app()->params['paramName']
     'params' => array(
         // this is used in contact page
-        'adminEmail'        => 'webmaster@example.com',
+        'adminEmail'        => require_once '_admin_email.php',
+
         // folder for saved favicons (yii path alias)
         'favicon_save_path' => 'webroot.favicons',
     ),

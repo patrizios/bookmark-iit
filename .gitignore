@@ -2,3 +2,4 @@ assets
 favicons
 protected/runtime
 protected/config/_db.php
+protected/config/_admin_email.php
