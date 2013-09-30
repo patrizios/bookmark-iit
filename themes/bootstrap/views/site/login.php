@@ -4,9 +4,7 @@
 /* @var $form CActiveForm  */
 
 $this->pageTitle    = 'Login';
-$this->breadcrumbs  = array(
-    'Login',
-);
+$this->layout       = null;
 ?>
 
 <p>Please fill out the following form with your login credentials:</p>

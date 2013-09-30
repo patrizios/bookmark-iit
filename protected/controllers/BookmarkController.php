@@ -28,20 +28,28 @@ class BookmarkController extends Controller
     public function accessRules()
     {
         return array(
+            /*
             array('allow',  // allow all users to perform 'index' and 'view' actions
                 'actions'=>array('index','view'),
                 'users'=>array('*'),
             ),
+             */
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions'=>array('create','update', 'addfromurl'),
-                'users'=>array('@'),
+                'actions'   => array(
+                    'index',
+                    'view',
+                    'create',
+                    'update',
+                    'addfromurl'
+                ),
+                'users'     => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
-                'actions'=>array('admin','delete'),
-                'users'=>array('admin'),
+                'actions'   => array('admin','delete'),
+                'users'     => array('admin'),
             ),
             array('deny',  // deny all users
-                'users'=>array('*'),
+                'users'     => array('*'),
             ),
         );
     }
@@ -132,8 +140,10 @@ class BookmarkController extends Controller
                     'url'           => $model->url,
                     'title'         => $model->title,
                     'description'   => $model->description,
+                    'favicon'       => $model->favicon,
                 );
             } else {
+                var_dump($model->errors, 'ooo'); die;
                 $errors = $model->errors;
             }
         }

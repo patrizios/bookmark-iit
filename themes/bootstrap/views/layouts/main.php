@@ -25,10 +25,12 @@
         <div class="row">
             <div class="col-lg-6">
                 <h3 class="text-muted">
+                  <img src="<?php echo $theme_path; ?>/assets/logo.png" />
                   <?php echo CHtml::encode(Yii::app()->name); ?>
                 </h3>
             </div>
             <div class="col-lg-6">
+                <?php if (!Yii::app()->user->isGuest): ?>
                 <?php
                 $this->widget(
                     'zii.widgets.CMenu',
@@ -63,6 +65,7 @@
                         'activeCssClass' => 'active'
                     )
                 ); ?>
+            <?php endif;?>
             </div>
           </div>
       </div>
